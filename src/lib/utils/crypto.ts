@@ -49,6 +49,11 @@ export function getMasterNode(seed: string) {
     return HDNode;
 }
 
+// Generate the Child NOde
+export function getChildren(masterNode :HDNodeWallet, index: number) {
+    const child = masterNode.derivePath(`m/44'/60'/0'/0/${index}`);
+    return child;
+}
 
 
 
