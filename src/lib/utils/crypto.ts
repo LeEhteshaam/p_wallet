@@ -1,4 +1,4 @@
-import {Wallet, Mnemonic} from 'ethers';
+import {Wallet, Mnemonic, HDNodeWallet} from 'ethers';
 
 // Generate a random Mnemonics with Entropy 
 export function generateMnemonic() {
@@ -42,6 +42,13 @@ export function getSeed(){
         seed: seed 
     }; 
 }
+
+// Generate the Master Node
+export function getMasterNode(seed: string) {
+    const HDNode = HDNodeWallet.fromSeed(seed);
+    return HDNode;
+}
+
 
 
 
