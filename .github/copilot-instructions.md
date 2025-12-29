@@ -8,7 +8,7 @@ We are building a **Hierarchical Deterministic (HD) Ethereum Wallet** to apply k
 ## 2. Tech Stack & Constraints
 * **Runtime:** Bun
 * **Framework:** SvelteKit (Svelte 5 syntax preferred if applicable, otherwise Svelte 4)
-* **Language:** JavaScript (Strictly NO TypeScript)
+* **Language:** TypeScript
 * **Crypto Library:** `ethers` (Version 6.x)
 * **Build Tool:** Vite (via SvelteKit)
 * **Styling:** CSS or Tailwind (if installed), keep it simple.
