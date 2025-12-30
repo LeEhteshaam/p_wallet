@@ -4,6 +4,7 @@
     import { Input } from "$lib/components/ui/input/index.js";
     import * as Card from "$lib/components/ui/card/index.js";
     import * as Alert from "$lib/components/ui/alert/index.js";
+    import { goto } from "$app/navigation";
 
     let password = $state("");
     let confirmPassword = $state("");
@@ -137,7 +138,13 @@
             <Button type="submit" class="w-full" onclick={handleSubmit}>
                 Create Password
             </Button>
-            <Button variant="outline" class="w-full">Back to Login</Button>
+            <Button
+                variant="outline"
+                class="w-full"
+                onclick={() => goto("/login")}
+            >
+                Back to Login
+            </Button>
         </Card.Footer>
     </Card.Root>
 </div>
