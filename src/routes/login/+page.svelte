@@ -12,9 +12,6 @@
         <Card.Header>
             <div class="flex items-center justify-between">
                 <Card.Title class="text-2xl">P-Wallet</Card.Title>
-                <Button variant="link" class="p-0 h-auto"
-                    >Make a New Wallet</Button
-                >
             </div>
             <Card.Description>Unlock your wallet to continue</Card.Description>
         </Card.Header>
