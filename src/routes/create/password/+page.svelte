@@ -79,12 +79,6 @@
 
         goto("/create/passphrase");
     }
-
-    function handleBack() {
-        // Clear entire wallet creation state when leaving the flow
-        walletCreation.clear();
-        goto("/login");
-    }
 </script>
 
 <div class="flex items-center justify-center min-h-screen bg-background">
@@ -148,13 +142,6 @@
         <Card.Footer class="flex-col gap-2">
             <Button type="submit" class="w-full" onclick={handleSubmit}>
                 Create Password
-            </Button>
-            <Button
-                variant="outline"
-                class="w-full"
-                onclick={handleBack}
-            >
-                Back to Login
             </Button>
         </Card.Footer>
     </Card.Root>
