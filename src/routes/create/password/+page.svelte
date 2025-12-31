@@ -5,6 +5,7 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import * as Alert from "$lib/components/ui/alert/index.js";
     import { goto } from "$app/navigation";
+    import { walletCreation } from "$lib/stores/walletCreationStore";
 
     let password = $state("");
     let confirmPassword = $state("");
@@ -72,7 +73,17 @@
         if (!passwordsMatch()) {
             return;
         }
-        // Password is valid - proceed with wallet creation
+
+        // Use Svelte store instead of sessionStorage
+        walletCreation.setPassword(password);
+
+        goto("/create/passphrase");
+    }
+
+    function handleBack() {
+        // Clear entire wallet creation state when leaving the flow
+        walletCreation.clear();
+        goto("/login");
     }
 </script>
 
@@ -141,7 +152,7 @@
             <Button
                 variant="outline"
                 class="w-full"
-                onclick={() => goto("/login")}
+                onclick={handleBack}
             >
                 Back to Login
             </Button>
