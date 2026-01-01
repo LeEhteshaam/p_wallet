@@ -5,13 +5,15 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { generateMnemonic } from "$lib/utils/crypto";
-    import { Mnemonic } from "ethers";
+    import { Mnemonic, HDNodeWallet } from "ethers";
     import { walletCreation } from "$lib/stores/walletCreationStore";
+    import { saveEncryptedWallet } from "$lib/walletStore"; // Import the bridge we made
 
     let seedWords = $state<string[]>([]);
     let passphrase = $state("");
     let copied = $state(false);
     let confirmed = $state(false);
+    let isProcessing = $state(false);
 
     onMount(() => {
         const state = walletCreation.get();
@@ -23,15 +25,12 @@
 
         passphrase = state.passphrase;
 
-        // Generate mnemonic
         const mnemonicPhrase = generateMnemonic();
         seedWords = mnemonicPhrase.split(" ");
 
-        // Compute seed with passphrase
         const mnemonic = Mnemonic.fromPhrase(mnemonicPhrase, passphrase);
         const seed = mnemonic.computeSeed();
 
-        // Store in Svelte store (in-memory only)
         walletCreation.setMnemonic(mnemonicPhrase);
         walletCreation.setSeed(seed);
     });
@@ -44,19 +43,29 @@
     }
 
     async function handleContinue() {
-        if (!confirmed) return;
+        if (!confirmed || isProcessing) return;
 
-        // TODO: Encrypt and save seed using Tauri backend
-        // await storeSeedPhrase(walletCreation.get().mnemonic, walletCreation.get().password);
+        isProcessing = true;
 
-        // Clear sensitive data from memory
-        walletCreation.clear();
+        try {
+            const state = walletCreation.get();
+            const wallet = HDNodeWallet.fromPhrase(
+                state.mnemonic,
+                state.passphrase,
+            );
 
-        goto("/");
+            await saveEncryptedWallet(wallet, state.password);
+            walletCreation.clear();
+
+            goto("/");
+        } catch (error) {
+            console.error("Encryption failed:", error);
+            alert("Failed to save wallet. Please try again.");
+            isProcessing = false; // Unlock button on error
+        }
     }
 
     function handleBack() {
-        // Clear mnemonic, seed and passphrase when going back
         walletCreation.setMnemonic("");
         walletCreation.setSeed("");
         walletCreation.setPassphrase("");
@@ -85,7 +94,6 @@
                     </Alert.Root>
                 {/if}
 
-                <!-- Storage Tip -->
                 <div
                     class="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950 p-3"
                 >
@@ -96,7 +104,6 @@
                     </p>
                 </div>
 
-                <!-- Seed Words Grid -->
                 <div class="grid grid-cols-3 gap-2">
                     {#each seedWords as word, index}
                         <div
@@ -112,7 +119,6 @@
                     {/each}
                 </div>
 
-                <!-- Copy Button -->
                 <Button
                     variant="outline"
                     size="sm"
@@ -122,7 +128,6 @@
                     {copied ? "✓ Copied!" : "Copy to Clipboard"}
                 </Button>
 
-                <!-- Confirmation Checkbox -->
                 <label class="flex items-start gap-2 cursor-pointer">
                     <input
                         type="checkbox"
@@ -139,11 +144,20 @@
             <Button
                 class="w-full"
                 onclick={handleContinue}
-                disabled={!confirmed}
+                disabled={!confirmed || isProcessing}
             >
-                Continue to Wallet
+                {#if isProcessing}
+                    Encrypting...
+                {:else}
+                    Continue to Wallet
+                {/if}
             </Button>
-            <Button variant="outline" class="w-full" onclick={handleBack}>
+            <Button
+                variant="outline"
+                class="w-full"
+                onclick={handleBack}
+                disabled={isProcessing}
+            >
                 Back
             </Button>
         </Card.Footer>
