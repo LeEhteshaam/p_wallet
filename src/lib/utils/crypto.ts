@@ -9,6 +9,32 @@ export function generateMnemonic() {
     return randomWallet.mnemonic.phrase;
 }
 
+/**
+ * Validate a mnemonic phrase using ethers v6
+ * @param phrase - The 12/24 word mnemonic phrase
+ * @returns true if valid, false otherwise
+ */
+export function isValidMnemonic(phrase: string): boolean {
+    try {
+        // Ethers v6: Use Mnemonic.isValidMnemonic static method
+        return Mnemonic.isValidMnemonic(phrase.trim());
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Normalize and clean mnemonic input
+ * @param phrase - Raw user input
+ * @returns Cleaned phrase with single spaces
+ */
+export function normalizeMnemonic(phrase: string): string {
+    return phrase
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' '); // Replace multiple spaces with single space
+}
+
 // Passphrase 
 
 export function askPassphrase() {
