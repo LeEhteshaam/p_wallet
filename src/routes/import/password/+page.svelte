@@ -38,12 +38,16 @@
         const hasUppercase = /[A-Z]/.test(password);
         const hasLowercase = /[a-z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
-        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+            password,
+        );
 
         const errors: string[] = [];
 
         if (password.length < minLength) {
-            errors.push(`At least ${minLength} characters (you have ${password.length})`);
+            errors.push(
+                `At least ${minLength} characters (you have ${password.length})`,
+            );
         }
         if (!hasUppercase) {
             errors.push("At least 1 uppercase letter (A-Z)");
@@ -95,7 +99,7 @@
             // Derive wallet from imported mnemonic + passphrase
             const wallet = HDNodeWallet.fromPhrase(
                 state.mnemonic,
-                state.passphrase
+                state.passphrase,
             );
 
             // Encrypt and save via Tauri backend
@@ -124,7 +128,8 @@
         <Card.Header>
             <Card.Title class="text-2xl">Set Encryption Password</Card.Title>
             <Card.Description>
-                Create a strong password to encrypt your imported wallet on this device.
+                Create a strong password to encrypt your imported wallet on this
+                device.
             </Card.Description>
         </Card.Header>
         <Card.Content>
@@ -190,7 +195,11 @@
                         </ul>
                     </div>
 
-                    <Button type="submit" class="w-full" disabled={isProcessing}>
+                    <Button
+                        type="submit"
+                        class="w-full"
+                        disabled={isProcessing}
+                    >
                         {#if isProcessing}
                             Encrypting & Saving...
                         {:else}

@@ -35,16 +35,6 @@
             </Card.Header>
             <Card.Content>
                 <div class="flex flex-col gap-4">
-                    <div
-                        class="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950 p-3"
-                    >
-                        <p class="text-xs text-blue-800 dark:text-blue-200">
-                            <span class="font-semibold">🔐 Self-Custodial:</span
-                            > Your keys never leave this device. Only you have access
-                            to your funds.
-                        </p>
-                    </div>
-
                     <Button
                         class="w-full"
                         size="lg"

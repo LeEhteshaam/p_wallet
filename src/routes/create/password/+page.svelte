@@ -143,6 +143,13 @@
             <Button type="submit" class="w-full" onclick={handleSubmit}>
                 Create Password
             </Button>
+            <Button
+                variant="outline"
+                class="w-full"
+                onclick={() => goto("/")}
+            >
+                Back
+            </Button>
         </Card.Footer>
     </Card.Root>
 </div>
