@@ -1,6 +1,6 @@
 import {ethers, HDNodeWallet} from 'ethers';
 
-const PROVIDER_URL = "https://rpc.sepolia.org"; 
+const PROVIDER_URL = "https://eth.llamarpc.com"; 
 const provider = new ethers.JsonRpcProvider(PROVIDER_URL);
 
 export async function getBalance(address: string): Promise<string> {
