@@ -4,10 +4,7 @@ const PROVIDER_URL = "https://eth.llamarpc.com";
 const provider = new ethers.JsonRpcProvider(PROVIDER_URL);
 
 export async function getBalance(address: string): Promise<string> {
-    // Get balance (returns a BigInt in "Wei")
     const balanceWei = await provider.getBalance(address);
-    
-    // Convert to readable string (e.g., "1.5")
     const balanceEth = ethers.formatEther(balanceWei);
     
     return balanceEth;
@@ -17,15 +14,13 @@ export async function sendUniversalTransaction(
     wallet: HDNodeWallet,
     toAddress: string,
     amountEth: string,
-    dataPayload: string = "0x" // Default to "0x" (Empty) for simple transfers
+    dataPayload: string = "0x" 
 ) {
     const connectedWallet = wallet.connect(provider);
     const amountWei = ethers.parseEther(amountEth);
 
     console.log("--- STARTING PRE-FLIGHT CHECKS ---");
-
-    // 1. ESTIMATE GAS (Crucial for Contracts)
-    // If we are calling a complex contract function, this number will be higher than 21,000
+    // 1. ESTIMATE GAS LIMIT
     let gasLimit;
     try {
         gasLimit = await connectedWallet.estimateGas({

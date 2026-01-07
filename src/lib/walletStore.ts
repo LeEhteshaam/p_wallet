@@ -15,21 +15,15 @@ export async function saveEncryptedWallet(wallet: HDNodeWallet, password: string
     return true;
 }
 
-/**
- * Check if a wallet keystore file exists
- */
 export async function walletExists(): Promise<boolean> {
     return await invoke<boolean>('wallet_exists');
 }
 
-/**
- * Get the stored public address (for recovery verification)
- */
 export async function getStoredAddress(): Promise<string> {
     return await invoke<string>('read_wallet_address');
 }
 
-/**
+/** 
  * Verify if a mnemonic + passphrase matches the stored wallet
  * @param mnemonic - The 12-word recovery phrase
  * @param passphrase - The optional passphrase (empty string if none)
