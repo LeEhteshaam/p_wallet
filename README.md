@@ -2,6 +2,8 @@
 
 A simply Ethereum HD (Hierarchical Deterministic Wallet) built as a desktop application. Project was built to apply content learnt from Mastering Ethereum. Try it out!
 
+[![Watch the video](https://img.youtube.com/vi/yemi-DCQSS4/maxresdefault.jpg)](https://www.youtube.com/watch?v=yemi-DCQSS4)
+
 ## Features
 
 - **HD Wallet Support**: Generate wallets using BIP-39/BIP-32/BIP-44 standards
