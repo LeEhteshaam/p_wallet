@@ -20,7 +20,6 @@
                 console.log(`Decrypting: ${Math.round(percent * 100)}%`);
             });
             walletCreation.setWallet(wallet);
-            // Success - wallet is now available
             goto("/home");
         } catch (err) {
             error = "Incorrect password or wallet file not found.";
@@ -46,7 +45,7 @@
                         <div class="flex items-center">
                             <Label for="password">Password</Label>
                             <a
-                                href="/forgot-password"
+                                href="/recover"
                                 class="ms-auto inline-block text-sm underline-offset-4 hover:underline"
                             >
                                 Forgot your password?

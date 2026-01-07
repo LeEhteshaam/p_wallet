@@ -10,6 +10,7 @@
     import {
         getBalance,
         sendUniversalTransaction,
+        estimateTransactionFee
     } from "$lib/utils/blockchain";
     import type { HDNodeWallet } from "ethers";
 
@@ -26,8 +27,10 @@
     let amount = $state("");
     let dataPayload = $state("");
     let isSending = $state(false);
+    let isEstimating = $state(false);
     let txHash = $state("");
     let txError = $state("");
+    let estimatedFee = $state("");
 
     onMount(async () => {
         const state = walletCreation.get();
@@ -79,11 +82,34 @@
         dataPayload = "";
         txHash = "";
         txError = "";
+        estimatedFee = "";
         showSendModal = true;
     }
 
     function closeSendModal() {
         showSendModal = false;
+    }
+
+    async function handleEstimate() {
+        if (!address || !toAddress || !amount) return;
+
+        txError = "";
+        isEstimating = true;
+
+        try {
+            estimatedFee = await estimateTransactionFee(
+                address,
+                toAddress,
+                amount,
+                dataPayload || "0x"
+            );
+        } catch (error) {
+            console.error("Estimation failed:", error);
+            txError = error instanceof Error ? error.message : "Failed to estimate gas";
+            estimatedFee = "";
+        } finally {
+            isEstimating = false;
+        }
     }
 
     async function handleSend() {
@@ -113,6 +139,15 @@
             isSending = false;
         }
     }
+
+    // Auto-estimate when inputs change
+    $effect(() => {
+        if (toAddress && amount && address) {
+            handleEstimate();
+        } else {
+            estimatedFee = "";
+        }
+    });
 </script>
 
 <div class="flex items-center justify-center min-h-screen bg-background p-4">
@@ -193,7 +228,7 @@
                 <div class="flex flex-col gap-4">
                     {#if txError}
                         <Alert.Root variant="destructive">
-                            <Alert.Title>Transaction Failed</Alert.Title>
+                            <Alert.Title>Error</Alert.Title>
                             <Alert.Description>{txError}</Alert.Description>
                         </Alert.Root>
                     {/if}
@@ -244,6 +279,30 @@
                             Leave empty for simple ETH transfers
                         </p>
                     </div>
+
+                    <!-- Gas Fee Display -->
+                    {#if estimatedFee}
+                        <div class="rounded-lg border bg-muted/50 p-3 text-sm space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Amount:</span>
+                                <span class="font-mono">{amount} ETH</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Gas Fee:</span>
+                                <span class="font-mono">{estimatedFee} ETH</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-1 font-semibold">
+                                <span>Total Cost:</span>
+                                <span class="font-mono">
+                                    {(parseFloat(amount) + parseFloat(estimatedFee)).toFixed(6)} ETH
+                                </span>
+                            </div>
+                        </div>
+                    {:else if isEstimating}
+                        <div class="rounded-lg border bg-muted/50 p-3 text-center text-sm text-muted-foreground">
+                            Estimating gas fee...
+                        </div>
+                    {/if}
                 </div>
             </Card.Content>
             <Card.Footer class="flex-col gap-2">
