@@ -31,6 +31,7 @@
     let txHash = $state("");
     let txError = $state("");
     let estimatedFee = $state("");
+    let isConfirmed = $state(false); // Track if user has confirmed inputs
 
     onMount(async () => {
         const state = walletCreation.get();
@@ -83,6 +84,7 @@
         txHash = "";
         txError = "";
         estimatedFee = "";
+        isConfirmed = false;
         showSendModal = true;
     }
 
@@ -90,7 +92,14 @@
         showSendModal = false;
     }
 
-    async function handleEstimate() {
+    function handleEditTransaction() {
+        // Allow user to go back and edit
+        isConfirmed = false;
+        estimatedFee = "";
+        txError = "";
+    }
+
+    async function handleConfirmAndEstimate() {
         if (!address || !toAddress || !amount) return;
 
         txError = "";
@@ -103,6 +112,8 @@
                 amount,
                 dataPayload || "0x"
             );
+            // Lock inputs after successful estimation
+            isConfirmed = true;
         } catch (error) {
             console.error("Estimation failed:", error);
             txError = error instanceof Error ? error.message : "Failed to estimate gas";
@@ -113,7 +124,7 @@
     }
 
     async function handleSend() {
-        if (!wallet || !toAddress || !amount) return;
+        if (!wallet || !toAddress || !amount || !isConfirmed) return;
 
         txError = "";
         txHash = "";
@@ -139,15 +150,6 @@
             isSending = false;
         }
     }
-
-    // Auto-estimate when inputs change
-    $effect(() => {
-        if (toAddress && amount && address) {
-            handleEstimate();
-        } else {
-            estimatedFee = "";
-        }
-    });
 </script>
 
 <div class="flex items-center justify-center min-h-screen bg-background p-4">
@@ -221,7 +223,7 @@
             <Card.Header>
                 <Card.Title>Send Transaction</Card.Title>
                 <Card.Description>
-                    Send ETH or interact with a smart contract
+                    {isConfirmed ? "Review and confirm your transaction" : "Send ETH or interact with a smart contract"}
                 </Card.Description>
             </Card.Header>
             <Card.Content>
@@ -251,7 +253,7 @@
                             type="text"
                             bind:value={toAddress}
                             placeholder="0x..."
-                            disabled={isSending}
+                            disabled={isSending || isConfirmed}
                         />
                     </div>
 
@@ -262,7 +264,7 @@
                             type="text"
                             bind:value={amount}
                             placeholder="0.01"
-                            disabled={isSending}
+                            disabled={isSending || isConfirmed}
                         />
                     </div>
 
@@ -273,15 +275,15 @@
                             type="text"
                             bind:value={dataPayload}
                             placeholder="0x (for contract calls)"
-                            disabled={isSending}
+                            disabled={isSending || isConfirmed}
                         />
                         <p class="text-xs text-muted-foreground">
                             Leave empty for simple ETH transfers
                         </p>
                     </div>
 
-                    <!-- Gas Fee Display -->
-                    {#if estimatedFee}
+                    <!-- Gas Fee Display (only shown after confirmation) -->
+                    {#if isConfirmed && estimatedFee}
                         <div class="rounded-lg border bg-muted/50 p-3 text-sm space-y-1">
                             <div class="flex justify-between">
                                 <span class="text-muted-foreground">Amount:</span>
@@ -300,31 +302,55 @@
                         </div>
                     {:else if isEstimating}
                         <div class="rounded-lg border bg-muted/50 p-3 text-center text-sm text-muted-foreground">
-                            Estimating gas fee...
+                            Calculating gas fee...
                         </div>
                     {/if}
                 </div>
             </Card.Content>
             <Card.Footer class="flex-col gap-2">
-                <Button
-                    class="w-full"
-                    onclick={handleSend}
-                    disabled={isSending || !toAddress || !amount}
-                >
-                    {#if isSending}
-                        Sending...
-                    {:else}
-                        Send Transaction
-                    {/if}
-                </Button>
-                <Button
-                    variant="outline"
-                    class="w-full"
-                    onclick={closeSendModal}
-                    disabled={isSending}
-                >
-                    {txHash ? "Close" : "Cancel"}
-                </Button>
+                {#if !isConfirmed && !txHash}
+                    <!-- Step 1: Review & Estimate Gas -->
+                    <Button
+                        class="w-full"
+                        onclick={handleConfirmAndEstimate}
+                        disabled={isEstimating || !toAddress || !amount}
+                    >
+                        {isEstimating ? "Calculating..." : "Review Transaction"}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        class="w-full"
+                        onclick={closeSendModal}
+                    >
+                        Cancel
+                    </Button>
+                {:else if isConfirmed && !txHash}
+                    <!-- Step 2: Send Transaction -->
+                    <Button
+                        class="w-full"
+                        onclick={handleSend}
+                        disabled={isSending}
+                    >
+                        {isSending ? "Sending..." : "Send Transaction"}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        class="w-full"
+                        onclick={handleEditTransaction}
+                        disabled={isSending}
+                    >
+                        Edit Transaction
+                    </Button>
+                {:else}
+                    <!-- Step 3: Transaction Sent -->
+                    <Button
+                        variant="outline"
+                        class="w-full"
+                        onclick={closeSendModal}
+                    >
+                        Close
+                    </Button>
+                {/if}
             </Card.Footer>
         </Card.Root>
     </div>
