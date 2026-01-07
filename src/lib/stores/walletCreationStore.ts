@@ -1,3 +1,4 @@
+import type { HDNodeWallet } from 'ethers';
 import { writable, get } from 'svelte/store';
 
 interface WalletCreationState {
@@ -5,13 +6,15 @@ interface WalletCreationState {
     passphrase: string;
     mnemonic: string;
     seed: string;
+    wallet: HDNodeWallet | null;
 }
 
 const initialState: WalletCreationState = {
     password: '',
     passphrase: '',
     mnemonic: '',
-    seed: ''
+    seed: '',
+    wallet: null
 };
 
 function createWalletCreationStore() {
@@ -24,6 +27,7 @@ function createWalletCreationStore() {
         setPassphrase: (passphrase: string) => update(state => ({ ...state, passphrase })),
         setMnemonic: (mnemonic: string) => update(state => ({ ...state, mnemonic })),
         setSeed: (seed: string) => update(state => ({ ...state, seed })),
+        setWallet: (wallet: HDNodeWallet | null) => update(state => ({ ...state, wallet })),
         clear: () => set(initialState),
         get: () => get(store)
     };

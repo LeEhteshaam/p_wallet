@@ -104,9 +104,7 @@
 
             // Encrypt and save via Tauri backend
             await saveEncryptedWallet(wallet, password);
-
-            // Clear sensitive data from memory
-            walletCreation.clear();
+            walletCreation.setWallet(wallet);
 
             // Navigate to home on success
             goto("/home");

@@ -55,7 +55,7 @@
             );
 
             await saveEncryptedWallet(wallet, state.password);
-            walletCreation.clear();
+            walletCreation.setWallet(wallet);
 
             goto("/");
         } catch (error) {

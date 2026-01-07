@@ -4,6 +4,7 @@
     import { Input } from "$lib/components/ui/input/index.js";
     import * as Card from "$lib/components/ui/card/index.js";
     import { loadEncryptedWallet } from "$lib/walletStore";
+    import { walletCreation } from "$lib/stores/walletCreationStore";
     import { goto } from "$app/navigation";
 
     let password = $state("");
@@ -18,6 +19,7 @@
             const wallet = await loadEncryptedWallet(password, (percent) => {
                 console.log(`Decrypting: ${Math.round(percent * 100)}%`);
             });
+            walletCreation.setWallet(wallet);
             // Success - wallet is now available
             goto("/home");
         } catch (err) {

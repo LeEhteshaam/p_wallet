@@ -6,7 +6,8 @@
     import * as Alert from "$lib/components/ui/alert/index.js";
     import { goto } from "$app/navigation";
     import { verifyRecoveryPhrase } from "$lib/walletStore";
-    import { recoveryStore } from "$lib/stores/recoveryStore";
+    import { walletCreation } from "$lib/stores/walletCreationStore";
+    import { HDNodeWallet } from "ethers";
 
     let seedWords = $state<string[]>(Array(12).fill(""));
     let passphrase = $state("");
@@ -49,8 +50,8 @@
             const isValid = await verifyRecoveryPhrase(mnemonic, passphrase);
 
             if (isValid) {
-                // Store mnemonic and passphrase temporarily for password reset page
-                recoveryStore.set(mnemonic, passphrase);
+                walletCreation.setMnemonic(mnemonic);
+                walletCreation.setPassphrase(passphrase);
                 goto("/recover/password");
             } else {
                 error =
